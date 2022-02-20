@@ -2,25 +2,35 @@ $(document).ready(() => {
   $("#formUser").on("submit", function (e) {
     e.preventDefault();
     //console.log("probando jquery");
+    
     const inputValue = $.trim($("#userNumber").val());
     //console.log(inputValue);
     if (isNaN(inputValue)) alert("Solo carácteres Numéricos");
-    else $("#headerContainer").hide();
+
+    const headerContainer = $("#headerContainer");
+    const heroData = $("#heroData");
+
+    const baseURL =
+      "https://akabab.github.io/superhero-api/api/id/" + inputValue + ".json";
 
     $.ajax({
       // Endpoint API
-      url:
-        "https://akabab.github.io/superhero-api/api/id/" + inputValue + ".json", //con cada click debe cambiar ese id/489 al valor del imput
+      url: baseURL,
       type: "GET",
       dataType: "JSON",
+      statusCode: {
+        404: () => {
+          headerContainer.show();
+          alert("SuperHero no encontrado, intenta con otro número");
+          heroData.hide();
+        },
+      },
       success: (data) => {
+        headerContainer.hide();
+        heroData.show();
+
+        // Datos de la card //
         const heroFullData = data;
-        /*  heroFullData.addEventListener("error",(event) => {
-          console.log(event);
-        });  por resolver error 404........ */
-        
-        
-        
         const nameHero = data.name;
         const imgHero = data.images.lg;
         console.log(heroFullData);
@@ -67,6 +77,7 @@ $(document).ready(() => {
                     </div>
                     `);
 
+        // Datos para la gráfica //
         const graphicHero = $("#graphicHero");
         const powerstats = data.powerstats;
         const intelligence = powerstats.intelligence;
